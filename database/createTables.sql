@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS Database_Managers(
 
 -- This trigger will limit database row count to at most 4.
 -- We will change delimiter temporarily to run trigger.
-DELIMITER //
+-- DELIMITER //
+drop trigger if exists chk_count;
 CREATE TRIGGER chk_count
 BEFORE INSERT
 ON Database_Managers
@@ -42,8 +43,8 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No more than 4 managers are allowed';
     END IF;
-END //
-DELIMITER ;
+END;
+-- DELIMITER ;
 
 -- Instructors table which is inherited from User table.
 -- password,name,surname,email,department_id should be taken from Users table using username key.
