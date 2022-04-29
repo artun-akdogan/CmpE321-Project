@@ -37,6 +37,11 @@ connection.commit()
 print("Inserting default variables ...")
 # TODO: insert initial database values.
 cursor.execute('INSERT IGNORE INTO Database_Managers VALUES ("admin","password");')
+cursor.execute('INSERT IGNORE INTO Department VALUES ("CMPE","Computer Engineering");')
+cursor.execute('INSERT IGNORE INTO User VALUES ("student","password", "name", "surname", "student@example.com", "CMPE");')
+cursor.execute('INSERT IGNORE INTO User VALUES ("instructor","password", "name", "surname", "instructor@example.com", "CMPE");')
+cursor.execute('INSERT IGNORE INTO Instructors VALUES ("instructor", "professor", "CMPE");')
+cursor.execute('INSERT IGNORE INTO Students VALUES ("student", 123, "");')
 
 connection.commit()
 

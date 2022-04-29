@@ -3,6 +3,9 @@ from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseRedirect
 from .forms import *
 from .db_utils import run_statement
+from . import database_managers
+from . import instructors
+from . import students
 
 def index(req):
     #Logout the user if logged 
@@ -20,21 +23,19 @@ def login(req):
     username=req.POST["username"]
     password=req.POST["password"]
 
-    result=run_statement(f"SELECT * FROM Database_Managers WHERE username='{username}' and password='{password}';") #Run the query in DB
+    result=run_statement(f"SELECT * FROM User WHERE username='{username}' and password='{password}';") #Run the query in DB
 
     if result: #If a result is retrieved
         req.session["username"]=username #Record username into the current session
-        return HttpResponseRedirect('../home') #Redirect user to home page
-    else:
-        return HttpResponseRedirect('../?fail=true')
-
-def homePage(req):
-    #result=run_statement(f"SELECT * FROM Post;") #Run the query in DB
+        is_instructor = run_statement(f"SELECT * FROM Instructors WHERE username='{username}';")
+        if is_instructor:
+            return HttpResponseRedirect('../instructors') #Redirect user to home page
+        is_student = run_statement(f"SELECT * FROM Students WHERE username='{username}';")
+        if is_student:
+            return HttpResponseRedirect('../students') #Redirect user to home page
+        
     
-    username=req.session["username"] #Retrieve the username of the logged-in user
-    #isFailed=req.GET.get("fail",False) #Try to retrieve GET parameter "fail", if it's not given set it to False
-
-    return render(req,'userHome.html',{"username":username})
+    return HttpResponseRedirect('../?fail=true')
 
 """
 def createPost(req):
@@ -52,7 +53,10 @@ def createPost(req):
 
 urlpatterns = [
     path('', index, name='index'),
-    path('home', homePage, name="homePage"),
-    path('login', login, name="login"),
+    path('database_managers', database_managers.homePage, name="database_managers"),
+    path('instructors', instructors.homePage, name="instructors"),
+    path('students', students.homePage, name="students"),
+    path('login/database_manager', database_managers.login, name="login_database_manager"),
+    path('login/user', login, name="login"),
     #path('createPost', createPost,name="createPost"),
 ]
