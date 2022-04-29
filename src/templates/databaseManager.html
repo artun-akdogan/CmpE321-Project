@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  	<title>Home</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        table, th, td {
+            border: 1px solid;
+        }
+        .center {
+            margin-left: auto;
+            margin-right: auto;
+            justify-content: center;
+        }
+        form { 
+            margin: 0 auto; 
+            width:250px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div style="background-color:lavender; !important" class="jumbotron text-center bg-primary">
+            <h2> Welcome back {{username}}.</h2>
+    </div>
+    <a href="{%url 'index' %}"> <p style="text-align:center">Logout</p></a>
+    <form id="createUser" class="form-group" method="POST" action="{%url 'createUser' %}">
+            {%csrf_token%}
+            <br>
+            <label>Create New User:</label>
+            <br>
+            <input type="text" name="username" placeholder="username" required>
+            <br>
+            <input type="text" name="password" placeholder="password" required>
+            <br>
+            <input type="text" name="name" placeholder="name" required>
+            <br>
+            <input type="text" name="surname" placeholder="surname" required>
+            <br>
+            <input type="text" name="email" placeholder="email" required>
+            <br>
+            <input type="text" name="department_id" placeholder="department id" required>
+            <br>
+            <input type="radio" id="instructor" name="type" value="instructor">
+            <label for="instructor">Instructor</label>
+            <br>
+            <input type="radio" id="student" name="type" value="student">
+            <label for="student">Student</label>
+            <br>
+            <input type="text" name="title" placeholder="Title (if instructor)">
+            <br>
+            <input type="text" name="student_id" placeholder="Student ID (if student)">
+            <br>
+            <input type="submit" name="submit" value="Create User">
+            <br>
+    </form>
+</body>
+</html>

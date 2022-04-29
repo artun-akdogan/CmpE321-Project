@@ -23,4 +23,4 @@ def homePage(req):
     username=req.session["username"] #Retrieve the username of the logged-in user
     #isFailed=req.GET.get("fail",False) #Try to retrieve GET parameter "fail", if it's not given set it to False
 
-    return render(req,'userHome.html',{"username":username})
+    return render(req,'databaseManager.html',{"username":username})

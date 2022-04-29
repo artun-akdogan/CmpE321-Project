@@ -54,6 +54,7 @@ def createPost(req):
 urlpatterns = [
     path('', index, name='index'),
     path('database_managers', database_managers.homePage, name="database_managers"),
+    path('database_managers/create_user', database_managers.createUser, name="createUser"),
     path('instructors', instructors.homePage, name="instructors"),
     path('students', students.homePage, name="students"),
     path('login/database_manager', database_managers.login, name="login_database_manager"),
