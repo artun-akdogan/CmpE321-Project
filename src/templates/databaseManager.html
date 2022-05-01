@@ -23,7 +23,12 @@
 <body>
     <div class="wrapper">
         <div style="background-color:lavender; !important" class="jumbotron text-center bg-primary">
-            <h2> Welcome back {{username}}.</h2>
+            <h2> Welcome back {{username}} {{action}}.</h2>
+            {% if action == 1 %}
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">Operation Completed Successfully</h4>
+                </div>
+            {% endif %}
     </div>
     <a href="{%url 'index' %}"> <p style="text-align:center">Logout</p></a>
     <form id="createUser" class="form-group" method="POST" action="{%url 'createUser' %}">
@@ -54,6 +59,28 @@
             <input type="text" name="student_id" placeholder="Student ID (if student)">
             <br>
             <input type="submit" name="submit" value="Create User">
+            <br>
+    </form>
+    <form id="deleteStudent" class="form-group" method="POST" action="{%url 'deleteStudent' %}">
+            {%csrf_token%}
+            <br>
+            <label>Delete Student:</label>
+            <br>
+            <input type="text" name="student_id" placeholder="student_id" required>
+            <br>
+            <input type="submit" name="submit" value="Delete">
+            <br>
+    </form>
+    <form id="updateInstructor" class="form-group" method="POST" action="{%url 'updateInstructor' %}">
+            {%csrf_token%}
+            <br>
+            <label>Update Instructor Title:</label>
+            <br>
+            <input type="text" name="username" placeholder="username" required>
+            <br>
+            <input type="text" name="title" placeholder="New Title">
+            <br>
+            <input type="submit" name="submit" value="Update">
             <br>
     </form>
 </body>
