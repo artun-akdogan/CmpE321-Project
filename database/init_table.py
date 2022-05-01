@@ -24,7 +24,9 @@ connection = mysql.connector.connect(
 )
 
 cursor= connection.cursor()
-
+# Drop previous tables if exists:
+print("Dropping previosly created tables ...")
+cursor.execute("DROP TABLE IF EXISTS Students,Course,Classroom,Instructors,Database_Managers,Grades,User,Department;")
 # Run createTables.sql
 print("Running createTables.sql ...")
 with open('createTables.sql', 'r') as f:
@@ -34,14 +36,23 @@ with open('createTables.sql', 'r') as f:
     
 connection.commit()
 
-print("Inserting default variables ...")
+print("Inserting example variables ...")
 # TODO: insert initial database values.
 cursor.execute('INSERT IGNORE INTO Database_Managers VALUES ("admin","password");')
 cursor.execute('INSERT IGNORE INTO Department VALUES ("CMPE","Computer Engineering");')
 cursor.execute('INSERT IGNORE INTO User VALUES ("student","password", "name", "surname", "student@example.com", "CMPE");')
+cursor.execute('INSERT IGNORE INTO User VALUES ("senior","password", "senior", "student", "senior@example.com", "CMPE");')
 cursor.execute('INSERT IGNORE INTO User VALUES ("instructor","password", "name", "surname", "instructor@example.com", "CMPE");')
 cursor.execute('INSERT IGNORE INTO Instructors VALUES ("instructor", "professor", "CMPE");')
-cursor.execute('INSERT IGNORE INTO Students VALUES ("student", 123, "");')
+cursor.execute('INSERT IGNORE INTO Students VALUES ("student", 123, "CMPE160");')
+cursor.execute('INSERT IGNORE INTO Students VALUES ("senior", 234, "");')
+cursor.execute('INSERT IGNORE INTO Classroom VALUES ("B2", "North", "100");')
+cursor.execute('INSERT IGNORE INTO Classroom VALUES ("A2", "North", "100");')
+cursor.execute('INSERT IGNORE INTO Course VALUES ("CMPE150", "CMPE", 150, 3, "instructor", "B2", 1, 100, "");')
+cursor.execute('INSERT IGNORE INTO Course VALUES ("CMPE160", "CMPE", 160, 4, "instructor", "A2", 1, 50, "[CMPE150]");')
+cursor.execute('INSERT IGNORE INTO Grades VALUES (123, "CMPE150", 3.0);')
+cursor.execute('INSERT IGNORE INTO Grades VALUES (234, "CMPE160", 3.5);')
+cursor.execute('INSERT IGNORE INTO Grades VALUES (234, "CMPE150", 3.0);')
 
 connection.commit()
 

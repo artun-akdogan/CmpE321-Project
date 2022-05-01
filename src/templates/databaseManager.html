@@ -83,5 +83,63 @@
             <input type="submit" name="submit" value="Update">
             <br>
     </form>
+    
+    <div class="container">
+        <h4>Students</h4>
+        <table class="center">
+            <!--
+            <colgroup>
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 70%;">
+                <col span="1" style="width: 15%;">
+            </colgroup>
+            -->
+            <tr>
+                <th>username</th>
+                <th>name</th>
+                <th>surname</th>
+                <th>email</th>
+                <th>department</th>
+                <th>completed credits</th>
+                <th>GPA</th>
+            </tr>
+            {% for row in students %}
+            <tr>
+                {% for value in row %}
+                <td>
+                    {{value}}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        <h4>Instructors</h4>
+        <table class="center">
+            <!--
+            <colgroup>
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 70%;">
+                <col span="1" style="width: 15%;">
+            </colgroup>
+            -->
+            <tr>
+                <th>username</th>
+                <th>name</th>
+                <th>surname</th>
+                <th>email</th>
+                <th>department</th>
+                <th>title</th>
+            </tr>
+            {% for row in instructors %}
+            <tr>
+                {% for value in row %}
+                <td>
+                    {{value}}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </body>
 </html>

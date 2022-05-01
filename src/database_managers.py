@@ -18,14 +18,19 @@ def login(req):
         return HttpResponseRedirect('../?fail=true')
 
 def homePage(req):
-    #result=run_statement(f"SELECT * FROM Post;") #Run the query in DB
-    
+    students=run_statement(f"SELECT u.username, u.name, u.surname, u.email, u.department_id,\
+        SUM(c.credits) as completed_credits, SUM(c.credits*g.grade)/SUM(c.credits) as gpa\
+        FROM User u, Students s, Course c, Grades g \
+        WHERE s.username=u.username and s.student_id=g.student_id and g.course_id=c.course_id\
+        GROUP BY s.username ORDER BY completed_credits;")
+    instructors=run_statement(f"SELECT u.username, u.name, u.surname, u.email, u.department_id, i.title\
+        FROM User u, Instructors i WHERE i.username=u.username;")
     username=req.session["username"] #Retrieve the username of the logged-in user
     action = req.GET.get("action", 0) #Check the value of the GET parameter
     try: action = int(action)
     except: action = 0
     #isFailed=req.GET.get("fail",False) #Try to retrieve GET parameter "fail", if it's not given set it to False
-    return render(req,'databaseManager.html',{"username":username, "action": action})
+    return render(req,'databaseManager.html',{"username":username, "action": action, "students": students, "instructors":instructors})
 
 def createUser(req):
     username = req.POST["username"]

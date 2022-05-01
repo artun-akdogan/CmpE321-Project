@@ -27,10 +27,11 @@ CREATE TABLE IF NOT EXISTS Database_Managers(
     PRIMARY KEY (username)
 );
 
+-- Delete triger if exists to prevent error.
+drop trigger if exists chk_count;
 -- This trigger will limit database row count to at most 4.
 -- We will change delimiter temporarily to run trigger.
 -- DELIMITER //
-drop trigger if exists chk_count;
 CREATE TRIGGER chk_count
 BEFORE INSERT
 ON Database_Managers
