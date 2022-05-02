@@ -5,14 +5,18 @@ from .forms import *
 from .db_utils import run_statement
 
 def homePage(req):
-    #result=run_statement(f"SELECT * FROM Post;") #Run the query in DB
-    
     username=req.session["username"] #Retrieve the username of the logged-in user
     action = req.GET.get("action", 0) #Check the value of the GET parameter
     try: action = int(action)
     except: action = 0
 
-    return render(req,'instructor.html',{"username":username, "action": action})
+    courses=run_statement(f"SELECT course_id, name, classroom_id, slot, quota, prerequisites\
+        FROM Course WHERE instructor_username=\'{username}\'")
+    # Remove square brackets
+    courses = list(map(lambda i: i[:-1] + tuple([i[-1][1:-1].replace("\"", "")]), courses))
+    
+
+    return render(req,'instructor.html',{"username": username, "action": action, "courses": courses})
 
 def getClassroom(req):
     slot = req.POST['slot']
@@ -43,6 +47,36 @@ def addPrerequisite(req):
     course_id = req.POST['course_id']
     prerequisite = req.POST['prerequisite']
     #print(run_statement(f"SELECT JSON_ARRAY_APPEND(prerequisites, '$', \'{prerequisite}\') FROM Course WHERE course_id=\'{course_id}\')"))
-    data = run_statement(f"UPDATE Course SET prerequisites=JSON_ARRAY_APPEND(prerequisites, '$', \'{prerequisite}\') WHERE course_id=\'{course_id}\'")
+    data = run_statement(f"UPDATE Course SET prerequisites=JSON_ARRAY_APPEND(prerequisites, '$', \'{prerequisite}\') \
+        WHERE course_id=\'{course_id}\' and not JSON_CONTAINS(prerequisites, \'\"{prerequisite}\"\', \'$\')")
     
+    return HttpResponseRedirect('../instructors?action=1')
+
+def getStudents(req):
+    course_id = req.POST['course_id']
+    username=req.session["username"] 
+    
+    data = run_statement(f"SELECT u.username, s.student_id, u.email, u.name, u.surname \
+        FROM User u, Students s, Course c WHERE c.course_id=\"{course_id}\" and c.instructor_username=\"{username}\" \
+        and u.username=s.username and JSON_CONTAINS(s.added_courses, \'\"{course_id}\"\', \'$\')")
+
+    return render(req, "table.html", {"title":f"Students added the course {course_id}:", 
+        "headers":("Username", "Student ID", "Email", "Name", "Surname"), "data":data})
+
+def changeCourse(req):
+    course_id = req.POST['course_id']
+    name = req.POST['name']
+    username=req.session["username"] 
+
+    run_statement(f"UPDATE Course SET name=\"{name}\" WHERE course_id=\"{course_id}\" and instructor_username=\"{username}\"")
+    return HttpResponseRedirect('../instructors?action=1')
+
+def enterGrade(req):
+    course_id = req.POST['course_id']
+    student_id = int(req.POST['student_id'])
+    grade = float(req.POST['grade'])
+    run_statement(f"UPDATE Students SET added_courses=JSON_REMOVE(added_courses, \
+        JSON_UNQUOTE(JSON_SEARCH(added_courses, 'all', \"{course_id}\"))) WHERE student_id={student_id}")
+    run_statement(f"INSERT INTO Grades VALUES({student_id},\"{course_id}\",{grade})")
+
     return HttpResponseRedirect('../instructors?action=1')
