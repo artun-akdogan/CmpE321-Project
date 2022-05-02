@@ -61,10 +61,10 @@ CREATE TABLE IF NOT EXISTS Instructors(
 
 -- Create Classroom table to ensure 3NF in Course table
 CREATE TABLE IF NOT EXISTS Classroom(
-    clasroom_id CHAR(100),
+    classroom_id CHAR(100),
     campus CHAR(100),
     classroom_capacity INTEGER,
-    PRIMARY KEY (clasroom_id)
+    PRIMARY KEY (classroom_id)
 );
 
 -- Create Course table if it does not exist. It would be both easier and convenient to check
@@ -78,17 +78,17 @@ CREATE TABLE IF NOT EXISTS Course(
     course_code INTEGER,
     credits INTEGER,
     instructor_username CHAR(100),
-    clasroom_id CHAR(100),
+    classroom_id CHAR(100),
     -- This line will ensure that slot value wil be between 1<=slot<=10
     slot INTEGER CHECK(slot>0 and slot<11),
     quota INTEGER,
     -- Prerequisites will be used as JSON_ARRAY
     prerequisites CHAR(100),
     -- This line will ensure that clasroom_id, and slot pairs are unique in each query
-    UNIQUE KEY class_time (clasroom_id, slot),
+    UNIQUE KEY class_time (classroom_id, slot),
     PRIMARY KEY (course_id),
     FOREIGN KEY (instructor_username) REFERENCES Instructors(username),
-    FOREIGN KEY (clasroom_id) REFERENCES Classroom (clasroom_id) 
+    FOREIGN KEY (classroom_id) REFERENCES Classroom (classroom_id) 
 );
 
 -- Students table which is inherited from User table.

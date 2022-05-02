@@ -60,3 +60,25 @@ def updateInstructor(req):
     title = req.POST["title"]
     result=run_statement(f"UPDATE Instructors SET title={title} WHERE username={username};")
     return HttpResponseRedirect('../database_managers?action=1')
+
+def getStudent(req):
+    student_id = req.POST["student_id"]
+    data=run_statement(f"SELECT g.course_id, c.name, g.grade\
+        FROM Grades g, Course c WHERE g.student_id=\"{student_id}\" and c.course_id=g.course_id;")
+    return render(req,'table.html', {"title": f"Student {student_id}'s grades:", 
+        "headers": ("Course ID", "Course Name", "Grade"), "data": data})
+
+def getInstructor(req):
+    username = req.POST["username"]
+    data=run_statement(f"SELECT c.course_id, c.name, c.classroom_id, s.campus, c.slot\
+        FROM Course c, Classroom s WHERE c.instructor_username=\"{username}\" and c.classroom_id=s.classroom_id;")
+    return render(req,'table.html', {"title": f"Instructor {username}'s courses:", 
+        "headers": ("Course ID", "Course Name", "Classroom ID", "Campus", "Time Slot"), "data": data})
+        
+def getCourse(req):
+    course_id = req.POST["course_id"]
+    data=run_statement(f"SELECT c.course_id, c.name, SUM(g.grade)/COUNT(g.course_id)\
+        FROM Course c, Grades g WHERE g.course_id=\"{course_id}\" and g.course_id=c.course_id\
+        GROUP BY g.course_id;")
+    return render(req,'table.html', {"title": f"", 
+        "headers": ("Course ID", "Course Name", "Average Grade"), "data": data})
