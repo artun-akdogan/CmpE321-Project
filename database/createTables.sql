@@ -51,7 +51,7 @@ END;
 -- password,name,surname,email,department_id should be taken from Users table using username key.
 CREATE TABLE IF NOT EXISTS Instructors(
     username CHAR(100),
-    title CHAR(100),
+    title CHAR(100) CHECK (title IN ('Assistant Professor','Associate Professor','Professor')),
     department_id CHAR(100),
     PRIMARY KEY (username),
     FOREIGN KEY (username) REFERENCES User(username)

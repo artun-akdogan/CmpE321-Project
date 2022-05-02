@@ -2,14 +2,14 @@
 from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from .forms import *
-from .db_utils import run_statement
+from .db_utils import run_statement, hash
 
 def login(req):
     #Retrieve data from the request body
     username=req.POST["username"]
     password=req.POST["password"]
 
-    result=run_statement(f"SELECT * FROM Database_Managers WHERE username='{username}' and password='{password}';") #Run the query in DB
+    result=run_statement(f"SELECT * FROM Database_Managers WHERE username='{username}' and password='{hash(password)}';") #Run the query in DB
 
     if result: #If a result is retrieved
         req.session["username"]=username #Record username into the current session
@@ -43,7 +43,7 @@ def createUser(req):
     title = req.POST["title"]
     student_id = req.POST["student_id"]
 
-    result=run_statement(f"INSERT INTO User VALUES(\"{username}\", \"{password}\", \"{name}\", \"{surname}\", \"{email}\", \"{department_id}\");")
+    result=run_statement(f"INSERT INTO User VALUES(\"{username}\", \"{hash(password)}\", \"{name}\", \"{surname}\", \"{email}\", \"{department_id}\");")
     if(user_type=="instructor"):
         result=run_statement(f"INSERT INTO Instructors VALUES(\"{username}\", \"{title}\", \"{department_id}\");")
     else:
@@ -52,13 +52,13 @@ def createUser(req):
 
 def deleteStudent(req):
     student_id = req.POST["student_id"]
-    result=run_statement(f"DELETE FROM Students WHERE student_id={student_id};")
+    result=run_statement(f"DELETE FROM Students WHERE student_id=\"{student_id}\";")
     return HttpResponseRedirect('../database_managers?action=1')
 
 def updateInstructor(req):
     username = req.POST["username"]
     title = req.POST["title"]
-    result=run_statement(f"UPDATE Instructors SET title={title} WHERE username={username};")
+    result=run_statement(f"UPDATE Instructors SET title=\"{title}\" WHERE username=\"{username}\";")
     return HttpResponseRedirect('../database_managers?action=1')
 
 def getStudent(req):

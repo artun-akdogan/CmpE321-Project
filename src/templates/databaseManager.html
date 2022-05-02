@@ -54,7 +54,12 @@
             <input type="radio" id="student" name="type" value="student">
             <label for="student">Student</label>
             <br>
-            <input type="text" name="title" placeholder="Title (if instructor)">
+            <label for="title">Title (if Instructor): </label>
+            <select name="title" id="title">
+                <option value="Assistant Professor">Assistant Professor</option>
+                <option value="Associate Professor">Associate Professor</option>
+                <option value="Professor">Professor</option>
+            </select>
             <br>
             <input type="text" name="student_id" placeholder="Student ID (if student)">
             <br>
@@ -78,7 +83,12 @@
             <br>
             <input type="text" name="username" placeholder="username" required>
             <br>
-            <input type="text" name="title" placeholder="New Title">
+            <label for="title">New Title: </label>
+            <select name="title" id="title">
+                <option value="Assistant Professor">Assistant Professor</option>
+                <option value="Associate Professor">Associate Professor</option>
+                <option value="Professor">Professor</option>
+            </select>
             <br>
             <input type="submit" name="submit" value="Update">
             <br>

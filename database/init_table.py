@@ -1,7 +1,9 @@
 #This script will initialize boun_database.
 
 # Warning: Following lines that set enviroment variables should be secured in another file
-import os
+import os, sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from src.db_utils import hash
 
 os.environ["MYSQL_DATABASE"] = "boun_database"
 os.environ["MYSQL_USER"] = "project_3"
@@ -38,11 +40,11 @@ connection.commit()
 
 print("Inserting example variables ...")
 # TODO: insert initial database values.
-cursor.execute('INSERT IGNORE INTO Database_Managers VALUES ("admin","password");')
+cursor.execute(f'INSERT IGNORE INTO Database_Managers VALUES ("admin","{hash("password")}");')
 cursor.execute('INSERT IGNORE INTO Department VALUES ("CMPE","Computer Engineering");')
-cursor.execute('INSERT IGNORE INTO User VALUES ("student","password", "name", "surname", "student@example.com", "CMPE");')
-cursor.execute('INSERT IGNORE INTO User VALUES ("senior","password", "senior", "student", "senior@example.com", "CMPE");')
-cursor.execute('INSERT IGNORE INTO User VALUES ("instructor","password", "name", "surname", "instructor@example.com", "CMPE");')
+cursor.execute(f'INSERT IGNORE INTO User VALUES ("student","{hash("password")}", "name", "surname", "student@example.com", "CMPE");')
+cursor.execute(f'INSERT IGNORE INTO User VALUES ("senior","{hash("password")}", "senior", "student", "senior@example.com", "CMPE");')
+cursor.execute(f'INSERT IGNORE INTO User VALUES ("instructor","{hash("password")}", "name", "surname", "instructor@example.com", "CMPE");')
 cursor.execute('INSERT IGNORE INTO Instructors VALUES ("instructor", "professor", "CMPE");')
 cursor.execute('INSERT IGNORE INTO Students VALUES ("student", 123, "CMPE160");')
 cursor.execute('INSERT IGNORE INTO Students VALUES ("senior", 234, "");')

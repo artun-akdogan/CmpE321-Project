@@ -2,7 +2,7 @@ from django.urls import path
 from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseRedirect
 from .forms import *
-from .db_utils import run_statement
+from .db_utils import run_statement, hash
 from . import database_managers
 from . import instructors
 from . import students
@@ -23,7 +23,7 @@ def login(req):
     username=req.POST["username"]
     password=req.POST["password"]
 
-    result=run_statement(f"SELECT * FROM User WHERE username='{username}' and password='{password}';") #Run the query in DB
+    result=run_statement(f"SELECT * FROM User WHERE username='{username}' and password='{hash(password)}';") #Run the query in DB
 
     if result: #If a result is retrieved
         req.session["username"]=username #Record username into the current session
