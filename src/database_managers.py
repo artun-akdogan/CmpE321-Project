@@ -47,7 +47,7 @@ def createUser(req):
     if(user_type=="instructor"):
         result=run_statement(f"INSERT INTO Instructors VALUES(\"{username}\", \"{title}\", \"{department_id}\");")
     else:
-        result=run_statement(f"INSERT INTO Students VALUES(\"{username}\", {student_id}, \"\");")
+        result=run_statement(f"INSERT INTO Students VALUES(\"{username}\", {student_id}, JSON_ARRAY());")
     return HttpResponseRedirect('../database_managers?action=1')
 
 def deleteStudent(req):

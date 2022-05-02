@@ -23,11 +23,17 @@
 <body>
     <div class="wrapper">
         <div style="background-color:lavender; !important" class="jumbotron text-center bg-primary">
-            <h2> Welcome back {{username}} {{action}}.</h2>
+            <h2> Welcome back {{username}}.</h2>
             {% if action == 1 %}
                 <div class="alert alert-danger" role="alert">
                     <h4 class="alert-heading">Operation Completed Successfully</h4>
                 </div>
+            {% else %}
+                {% if action == 2 %}
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Operation Failed</h4>
+                    </div>
+                {% endif %}
             {% endif %}
     </div>
     <a href="{%url 'index' %}"> <p style="text-align:center">Logout</p></a>

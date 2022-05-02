@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS Course(
     slot INTEGER CHECK(slot>0 and slot<11),
     quota INTEGER,
     -- Prerequisites will be used as JSON_ARRAY
-    prerequisites CHAR(100),
+    prerequisites JSON,
     -- This line will ensure that clasroom_id, and slot pairs are unique in each query
     UNIQUE KEY class_time (classroom_id, slot),
     PRIMARY KEY (course_id),
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS Students(
     username CHAR(100),
     student_id INTEGER,
     -- added_courses will be used as JSON_ARRAY
-    added_courses CHAR(100),
+    added_courses JSON,
     PRIMARY KEY (student_id),
     FOREIGN KEY (username) REFERENCES User(username)
     -- If we modify or delete in this table, we should also do them on User table.
