@@ -46,6 +46,32 @@
         <input type="submit" name="submit" value="Add">
         <br>
     </form>
+    <form id="search" class="form-group" method="POST" action="{%url 'search' %}">
+        {%csrf_token%}
+        <br>
+        <label>Search Courses: </label>
+        <br>
+        <input type="text" name="keyword" placeholder="Keyword" required>
+        <br>
+        <input type="submit" name="submit" value="Search">
+        <br>
+    </form>
+    <form id="filter" class="form-group" method="POST" action="{%url 'filter' %}">
+        {%csrf_token%}
+        <br>
+        <label>Filter Courses: </label>
+        <br>
+        <input type="text" name="department_id" placeholder="Department" required>
+        <br>
+        <input type="text" name="campus" placeholder="Campus" required>
+        <br>
+        <input type="text" name="min_credit" placeholder="Minimum Credit" required>
+        <br>
+        <input type="text" name="max_credit" placeholder="Maximum Credit" required>
+        <br>
+        <input type="submit" name="submit" value="Filter">
+        <br>
+    </form>
     <a href="{%url 'index' %}"> <p style="text-align:center">Logout</p></a><div class="container">
         <h4>Courses</h4>
         <table class="center">
@@ -68,6 +94,30 @@
                 <th>Prerequisites</th>
             </tr>
             {% for row in courses %}
+            <tr>
+                {% for value in row %}
+                <td>
+                    {{value}}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        <h4>Taken Courses</h4>
+        <table class="center">
+            <!--
+            <colgroup>
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 70%;">
+                <col span="1" style="width: 15%;">
+            </colgroup>
+            -->
+            <tr>
+                <th>Course ID</th>
+                <th>Course Name</th>
+                <th>Grade</th>
+            </tr>
+            {% for row in taken %}
             <tr>
                 {% for value in row %}
                 <td>
