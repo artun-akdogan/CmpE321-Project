@@ -76,7 +76,7 @@ def getInstructor(req):
         "headers": ("Course ID", "Course Name", "Classroom ID", "Campus", "Time Slot"), "data": data})
         
 def getCourse(req):
-    course_id = req.POST["course_id"]
+    course_id = req.POST["course_id"].upper()
     data=run_statement(f"SELECT c.course_id, c.name, SUM(g.grade)/COUNT(g.course_id)\
         FROM Course c, Grades g WHERE g.course_id=\"{course_id}\" and g.course_id=c.course_id\
         GROUP BY g.course_id;")

@@ -68,6 +68,7 @@ urlpatterns = [
     path('instructors/change_course', instructors.changeCourse, name="changeCourse"),
     path('instructors/enter_grade', instructors.enterGrade, name="enterGrade"),
     path('students', students.homePage, name="students"),
+    path('students/add_course', students.addCourse, name="addCourse"),
     path('login/database_manager', database_managers.login, name="login_database_manager"),
     path('login/user', login, name="login"),
     #path('createPost', createPost,name="createPost"),

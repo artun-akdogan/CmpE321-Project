@@ -14,7 +14,6 @@ def homePage(req):
         FROM Course WHERE instructor_username=\'{username}\'")
     # Remove square brackets
     courses = list(map(lambda i: i[:-1] + tuple([i[-1][1:-1].replace("\"", "")]), courses))
-    
 
     return render(req,'instructor.html',{"username": username, "action": action, "courses": courses})
 
@@ -29,7 +28,7 @@ def getClassroom(req):
 def createCourse(req):
     try:
         username=req.session["username"] 
-        course_id = req.POST['course_id']
+        course_id = req.POST['course_id'].upper()
         name = req.POST['name']
         course_code = int(course_id[-3:])
         credits = int(req.POST['credits'])
@@ -44,16 +43,22 @@ def createCourse(req):
     return HttpResponseRedirect('../instructors?action=1')
     
 def addPrerequisite(req):
-    course_id = req.POST['course_id']
-    prerequisite = req.POST['prerequisite']
-    #print(run_statement(f"SELECT JSON_ARRAY_APPEND(prerequisites, '$', \'{prerequisite}\') FROM Course WHERE course_id=\'{course_id}\')"))
-    data = run_statement(f"UPDATE Course SET prerequisites=JSON_ARRAY_APPEND(prerequisites, '$', \'{prerequisite}\') \
-        WHERE course_id=\'{course_id}\' and not JSON_CONTAINS(prerequisites, \'\"{prerequisite}\"\', \'$\')")
+    try:
+        course_id = req.POST['course_id'].upper()
+        prerequisite = req.POST['prerequisite'].upper()
+        course_code = int(course_id[-3:])
+        prerequisite_code = int(prerequisite[-3:])
+        # Check if prerequisite valid, then try to append the new prerequisite
+        if course_code>prerequisite_code and run_statement(f"SELECT * FROM Course WHERE course_id=\"{prerequisite}\""):
+            data = run_statement(f"UPDATE Course SET prerequisites=JSON_ARRAY_APPEND(prerequisites, '$', \'{prerequisite}\') \
+                WHERE course_id=\'{course_id}\' and not JSON_CONTAINS(prerequisites, \'\"{prerequisite}\"\', \'$\')")
     
-    return HttpResponseRedirect('../instructors?action=1')
+            return HttpResponseRedirect('../instructors?action=1')
+    except: pass
+    return HttpResponseRedirect('../instructors?action=2')
 
 def getStudents(req):
-    course_id = req.POST['course_id']
+    course_id = req.POST['course_id'].upper()
     username=req.session["username"] 
     
     data = run_statement(f"SELECT u.username, s.student_id, u.email, u.name, u.surname \
@@ -64,7 +69,7 @@ def getStudents(req):
         "headers":("Username", "Student ID", "Email", "Name", "Surname"), "data":data})
 
 def changeCourse(req):
-    course_id = req.POST['course_id']
+    course_id = req.POST['course_id'].upper()
     name = req.POST['name']
     username=req.session["username"] 
 
@@ -72,7 +77,7 @@ def changeCourse(req):
     return HttpResponseRedirect('../instructors?action=1')
 
 def enterGrade(req):
-    course_id = req.POST['course_id']
+    course_id = req.POST['course_id'].upper()
     student_id = int(req.POST['student_id'])
     grade = float(req.POST['grade'])
     run_statement(f"UPDATE Students SET added_courses=JSON_REMOVE(added_courses, \
