@@ -18,6 +18,6 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
-# Catch the main.
+# Catch the main then set the environment.
 if __name__ == '__main__':
     main()
