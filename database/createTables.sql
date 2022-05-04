@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS Course(
 -- password,name,surname,email,department_id should be taken from Users table using username key.
 CREATE TABLE IF NOT EXISTS Students(
     username CHAR(100),
-    student_id INTEGER,
+    student_id BIGINT,
     -- added_courses will be used as JSON_ARRAY
     added_courses JSON,
     completed_credits INT DEFAULT 0,
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS Students(
 -- Create Grades table if not exist. primary keys are student_id and course_id,
 -- which are also referanced from other tables.
 CREATE TABLE IF NOT EXISTS Grades(
-    student_id INTEGER,
+    student_id BIGINT,
     course_id CHAR(100),
     grade FLOAT,
     PRIMARY KEY (course_id, student_id),

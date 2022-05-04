@@ -50,17 +50,17 @@ def createUser(req):
         department_id = req.POST["department_id"]
         user_type = req.POST["type"]
         title = req.POST["title"]
-        student_id = req.POST["student_id"]
+        student_id = int(req.POST["student_id"])
         # Insertion of that tuple is executed in this way.
         result=run_statement(f"INSERT INTO User VALUES(\"{username}\", \"{hash(password)}\", \"{name}\", \"{surname}\", \"{email}\", \"{department_id}\");")
         # We need to also add the tuple into the table instructors or students.
         if(user_type=="instructor"):
             result=run_statement(f"INSERT INTO Instructors VALUES(\"{username}\", \"{title}\", \"{department_id}\");")
         else:
-            result=run_statement(f"INSERT INTO Students VALUES(\"{username}\", {student_id}, JSON_ARRAY());")
+            result=run_statement(f"INSERT INTO Students VALUES(\"{username}\", {student_id}, JSON_ARRAY(), DEFAULT, DEFAULT);")
         return HttpResponseRedirect('../database_managers?action=1')
     except: pass
-    return HttpResponseRedirect('../instructors?action=2')
+    return HttpResponseRedirect('../database_managers?action=2')
 
 def deleteStudent(req):
     try:
@@ -71,7 +71,7 @@ def deleteStudent(req):
         # Then set action equals 1.
         return HttpResponseRedirect('../database_managers?action=1')
     except: pass
-    return HttpResponseRedirect('../instructors?action=2')
+    return HttpResponseRedirect('../database_managers?action=2')
 
 def updateInstructor(req):
     try:
@@ -81,7 +81,7 @@ def updateInstructor(req):
         result=run_statement(f"UPDATE Instructors SET title=\"{title}\" WHERE username=\"{username}\";")
         return HttpResponseRedirect('../database_managers?action=1') 
     except: pass
-    return HttpResponseRedirect('../instructors?action=2')
+    return HttpResponseRedirect('../database_managers?action=2')
 
 def getStudent(req):
     # To get a student, we do the same thing. Collect data, execute query with that data.
