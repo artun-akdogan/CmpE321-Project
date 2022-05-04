@@ -97,6 +97,8 @@ CREATE TABLE IF NOT EXISTS Grades(
     FOREIGN KEY (course_id) REFERENCES Course(course_id) 
 );
 
+-- Create a procedure "filter" if it does not exist.
+-- Take the 4 parameters, then filter the data based on those.
 DROP PROCEDURE IF EXISTS filter;
 CREATE PROCEDURE filter( IN department_id CHAR(100), 
                         IN campus CHAR(100), 
@@ -126,6 +128,8 @@ END;
 
 -- Delete triger if exists to prevent error.
 DROP TRIGGER IF EXISTS chk_quota;
+-- This trigger checks the relation between quota and classrom capacity.
+-- It checks and gives error if there is conflict between them.
 CREATE TRIGGER chk_quota BEFORE INSERT ON Course FOR EACH ROW
 BEGIN
     SELECT s.classroom_capacity INTO @capacity FROM Classroom s
@@ -139,6 +143,8 @@ END;
 
 -- Delete triger if exists to prevent error.
 DROP TRIGGER IF EXISTS chk_student;
+-- This trigger sets the gpa with the calculation given whenever
+-- there is an insertion to the talble grades.
 CREATE TRIGGER chk_student AFTER INSERT ON Grades FOR EACH ROW
 BEGIN
     SELECT SUM(c.credits), SUM(c.credits*g.grade)/SUM(c.credits) INTO @credits, @gpa
