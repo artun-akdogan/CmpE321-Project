@@ -6,6 +6,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
+    # Setting the environment for django module.
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cmpe321_p3.settings')
     try:
         from django.core.management import execute_from_command_line
@@ -17,6 +18,6 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
-
+# Catch the main then set the environment.
 if __name__ == '__main__':
     main()

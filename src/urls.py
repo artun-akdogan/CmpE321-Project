@@ -22,10 +22,11 @@ def login(req):
     #Retrieve data from the request body
     username=req.POST["username"]
     password=req.POST["password"]
-
+    # Then check the database wheter or not there is a tuple satisfying this credentials.
     result=run_statement(f"SELECT * FROM User WHERE username='{username}' and password='{hash(password)}';") #Run the query in DB
-
+    
     if result: #If a result is retrieved
+        # If there is a tuple, then execute the query based on if it is instructor o student.
         req.session["username"]=username #Record username into the current session
         is_instructor = run_statement(f"SELECT * FROM Instructors WHERE username='{username}';")
         if is_instructor:
@@ -34,23 +35,10 @@ def login(req):
         if is_student:
             return HttpResponseRedirect('../students') #Redirect user to home page
         
-    
+    # If no, redirect to fail=true
     return HttpResponseRedirect('../?fail=true')
 
-"""
-def createPost(req):
-    #Retrieve data from the request body
-    title=req.POST["title"]
-    body=req.POST["body"]
-    logged_user=req.session["username"]
-    try:
-        run_statement(f"CALL CreatePost('{title}','{body}','{logged_user}')")
-        return HttpResponseRedirect("../forum/home")
-    except Exception as e:
-        print(str(e))
-        return HttpResponseRedirect('../forum/home?fail=true')
-"""
-
+# Set the paths.
 urlpatterns = [
     path('', index, name='index'),
     path('database_managers', database_managers.homePage, name="database_managers"),
@@ -73,5 +61,4 @@ urlpatterns = [
     path('students/filter', students.filter, name="filter"),
     path('login/database_manager', database_managers.login, name="login_database_manager"),
     path('login/user', login, name="login"),
-    #path('createPost', createPost,name="createPost"),
 ]

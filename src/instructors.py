@@ -4,6 +4,8 @@ from django.shortcuts import render
 from .forms import *
 from .db_utils import run_statement
 
+# Note that action==1 if Operation completed successfully, 
+# and action==2 if Operation failed. None if any other.
 def homePage(req):
     username=req.session["username"] #Retrieve the username of the logged-in user
     action = req.GET.get("action", 0) #Check the value of the GET parameter
@@ -18,6 +20,7 @@ def homePage(req):
     return render(req,'instructor.html',{"username": username, "action": action, "courses": courses})
 
 def getClassroom(req):
+    # To list all of the classrooms available for a given slot.
     slot = req.POST['slot']
     try: slot = int(slot)
     except: return render(req, "table.html", {})
@@ -26,6 +29,7 @@ def getClassroom(req):
         "headers": ("Classroom ID", "Campus", "Classroom Capacity"), "data": data})
 
 def createCourse(req):
+    # To create a course with the paramaters.
     try:
         username=req.session["username"] 
         course_id = req.POST['course_id'].upper()
@@ -43,6 +47,7 @@ def createCourse(req):
     return HttpResponseRedirect('../instructors?action=1')
     
 def addPrerequisite(req):
+    # To add a prerequisite to a course by providing its course_id and checking the prerequisites.
     try:
         course_id = req.POST['course_id'].upper()
         prerequisite = req.POST['prerequisite'].upper()
@@ -58,6 +63,7 @@ def addPrerequisite(req):
     return HttpResponseRedirect('../instructors?action=2')
 
 def getStudents(req):
+    # To get students who added a specific course.
     course_id = req.POST['course_id'].upper()
     username=req.session["username"] 
     
@@ -69,19 +75,28 @@ def getStudents(req):
         "headers":("Username", "Student ID", "Email", "Name", "Surname"), "data":data})
 
 def changeCourse(req):
-    course_id = req.POST['course_id'].upper()
-    name = req.POST['name']
-    username=req.session["username"] 
+    try:
+        # To enable instructor to change the name of a course with course_id.
+        course_id = req.POST['course_id'].upper()
+        name = req.POST['name']
+        username=req.session["username"] 
 
-    run_statement(f"UPDATE Course SET name=\"{name}\" WHERE course_id=\"{course_id}\" and instructor_username=\"{username}\"")
-    return HttpResponseRedirect('../instructors?action=1')
+        run_statement(f"UPDATE Course SET name=\"{name}\" WHERE course_id=\"{course_id}\" and instructor_username=\"{username}\"")
+        return HttpResponseRedirect('../instructors?action=1')
+    except: pass
+    return HttpResponseRedirect('../instructors?action=2')
 
 def enterGrade(req):
-    course_id = req.POST['course_id'].upper()
-    student_id = int(req.POST['student_id'])
-    grade = float(req.POST['grade'])
-    run_statement(f"UPDATE Students SET added_courses=JSON_REMOVE(added_courses, \
-        JSON_UNQUOTE(JSON_SEARCH(added_courses, 'all', \"{course_id}\"))) WHERE student_id={student_id}")
-    run_statement(f"INSERT INTO Grades VALUES({student_id},\"{course_id}\",{grade})")
-
-    return HttpResponseRedirect('../instructors?action=1')
+    try:
+        # To enable instructor to enter a grade for a student.
+        # First, collect parameters.
+        course_id = req.POST['course_id'].upper()
+        student_id = int(req.POST['student_id'])
+        grade = float(req.POST['grade'])
+        # Then synchronize the database with insertion/updation.
+        run_statement(f"UPDATE Students SET added_courses=JSON_REMOVE(added_courses, \
+            JSON_UNQUOTE(JSON_SEARCH(added_courses, 'all', \"{course_id}\"))) WHERE student_id={student_id}")
+        run_statement(f"INSERT INTO Grades VALUES({student_id},\"{course_id}\",{grade})")
+        return HttpResponseRedirect('../instructors?action=1')
+    except: pass
+    return HttpResponseRedirect('../instructors?action=2')
