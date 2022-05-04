@@ -1,13 +1,14 @@
 To run the program:
-First run init_table.py in database folder with current path is on ./database
-Then, run python manage.py runserver
-Note that database should be MySQL with following settings:
+At begining, run pip install -r requirements.txt
+Then, run init_table.py in database folder with current path is on ./database
+Last, run python manage.py runserver
+Note that we used python 3.8 and database should be MySQL with following settings:
 MYSQL_DATABASE = "boun_database"
 MYSQL_USER = "project_3"
 MYSQL_PASSWORD = "secret"
 MYSQL_HOST = "localhost"
 
-Requirements:
+If pip install command was not enough, note that our environment was like this:
 apt-xapian-index==0.49
 asgiref==3.5.0
 backports.zoneinfo==0.2.1

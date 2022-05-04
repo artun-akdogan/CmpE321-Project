@@ -1,0 +1,6 @@
+Django==3.2.3
+environ==1.0
+django_environ==0.8.1
+mysql_connector_python==8.0.29
+mysqlclient==2.1.0
+django-crispy-forms==1.14.0
