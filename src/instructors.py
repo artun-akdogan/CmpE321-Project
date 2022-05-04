@@ -4,6 +4,8 @@ from django.shortcuts import render
 from .forms import *
 from .db_utils import run_statement
 
+# Note that action==1 if Operation completed successfully, 
+# and action==2 if Operation failed. None if any other.
 def homePage(req):
     username=req.session["username"] #Retrieve the username of the logged-in user
     action = req.GET.get("action", 0) #Check the value of the GET parameter
@@ -69,19 +71,26 @@ def getStudents(req):
         "headers":("Username", "Student ID", "Email", "Name", "Surname"), "data":data})
 
 def changeCourse(req):
-    course_id = req.POST['course_id'].upper()
-    name = req.POST['name']
-    username=req.session["username"] 
+    try:
+        course_id = req.POST['course_id'].upper()
+        name = req.POST['name']
+        username=req.session["username"] 
 
-    run_statement(f"UPDATE Course SET name=\"{name}\" WHERE course_id=\"{course_id}\" and instructor_username=\"{username}\"")
-    return HttpResponseRedirect('../instructors?action=1')
+        run_statement(f"UPDATE Course SET name=\"{name}\" WHERE course_id=\"{course_id}\" and instructor_username=\"{username}\"")
+        return HttpResponseRedirect('../instructors?action=1')
+    except: pass
+    return HttpResponseRedirect('../instructors?action=2')
+
 
 def enterGrade(req):
-    course_id = req.POST['course_id'].upper()
-    student_id = int(req.POST['student_id'])
-    grade = float(req.POST['grade'])
-    run_statement(f"UPDATE Students SET added_courses=JSON_REMOVE(added_courses, \
-        JSON_UNQUOTE(JSON_SEARCH(added_courses, 'all', \"{course_id}\"))) WHERE student_id={student_id}")
-    run_statement(f"INSERT INTO Grades VALUES({student_id},\"{course_id}\",{grade})")
+    try:
+        course_id = req.POST['course_id'].upper()
+        student_id = int(req.POST['student_id'])
+        grade = float(req.POST['grade'])
+        run_statement(f"UPDATE Students SET added_courses=JSON_REMOVE(added_courses, \
+            JSON_UNQUOTE(JSON_SEARCH(added_courses, 'all', \"{course_id}\"))) WHERE student_id={student_id}")
+        run_statement(f"INSERT INTO Grades VALUES({student_id},\"{course_id}\",{grade})")
 
-    return HttpResponseRedirect('../instructors?action=1')
+        return HttpResponseRedirect('../instructors?action=1')
+    except: pass
+    return HttpResponseRedirect('../instructors?action=2')

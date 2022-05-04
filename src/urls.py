@@ -37,20 +37,6 @@ def login(req):
     
     return HttpResponseRedirect('../?fail=true')
 
-"""
-def createPost(req):
-    #Retrieve data from the request body
-    title=req.POST["title"]
-    body=req.POST["body"]
-    logged_user=req.session["username"]
-    try:
-        run_statement(f"CALL CreatePost('{title}','{body}','{logged_user}')")
-        return HttpResponseRedirect("../forum/home")
-    except Exception as e:
-        print(str(e))
-        return HttpResponseRedirect('../forum/home?fail=true')
-"""
-
 urlpatterns = [
     path('', index, name='index'),
     path('database_managers', database_managers.homePage, name="database_managers"),
@@ -73,5 +59,4 @@ urlpatterns = [
     path('students/filter', students.filter, name="filter"),
     path('login/database_manager', database_managers.login, name="login_database_manager"),
     path('login/user', login, name="login"),
-    #path('createPost', createPost,name="createPost"),
 ]

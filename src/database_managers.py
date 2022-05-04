@@ -9,7 +9,7 @@ def login(req):
     # To login, first we post the credentials,
     username=req.POST["username"]
     password=req.POST["password"]
-    #                                          then we look for a tuple who satisfies those credentials. 
+    # then we look for a tuple who satisfies those credentials. 
     # PS: run_statement is just to execute that query and return the result.
     # Here again we need to compare the hashed version of the password with the database.
     result=run_statement(f"SELECT * FROM Database_Managers WHERE username='{username}' and password='{hash(password)}';") #Run the query in DB
@@ -22,6 +22,8 @@ def login(req):
         # If there is no tuple like that, we set the "fail" as true.
         return HttpResponseRedirect('../?fail=true')
 
+# Note that action==1 if Operation completed successfully, 
+# and action==2 if Operation failed. None if any other.
 def homePage(req):
     # students is the result of that query.
     students=run_statement(f"SELECT u.username, u.name, u.surname, u.email, u.department_id,\
@@ -38,39 +40,48 @@ def homePage(req):
     return render(req,'databaseManager.html',{"username":username, "action": action, "students": students, "instructors":instructors})
 
 def createUser(req):
-    # To create a user, we need to first collect data. After the user posted that credentials, we need to insert that tuple into the database.
-    username = req.POST["username"]
-    password = req.POST["password"]
-    name = req.POST["name"]
-    surname = req.POST["surname"]
-    email = req.POST["email"]
-    department_id = req.POST["department_id"]
-    user_type = req.POST["type"]
-    title = req.POST["title"]
-    student_id = req.POST["student_id"]
-    # Insertion of that tuple is executed in this way.
-    result=run_statement(f"INSERT INTO User VALUES(\"{username}\", \"{hash(password)}\", \"{name}\", \"{surname}\", \"{email}\", \"{department_id}\");")
-    # We need to also add the tuple into the table instructors or students.
-    if(user_type=="instructor"):
-        result=run_statement(f"INSERT INTO Instructors VALUES(\"{username}\", \"{title}\", \"{department_id}\");")
-    else:
-        result=run_statement(f"INSERT INTO Students VALUES(\"{username}\", {student_id}, JSON_ARRAY());")
-    return HttpResponseRedirect('../database_managers?action=1')
+    try:
+        # To create a user, we need to first collect data. After the user posted that credentials, we need to insert that tuple into the database.
+        username = req.POST["username"]
+        password = req.POST["password"]
+        name = req.POST["name"]
+        surname = req.POST["surname"]
+        email = req.POST["email"]
+        department_id = req.POST["department_id"]
+        user_type = req.POST["type"]
+        title = req.POST["title"]
+        student_id = req.POST["student_id"]
+        # Insertion of that tuple is executed in this way.
+        result=run_statement(f"INSERT INTO User VALUES(\"{username}\", \"{hash(password)}\", \"{name}\", \"{surname}\", \"{email}\", \"{department_id}\");")
+        # We need to also add the tuple into the table instructors or students.
+        if(user_type=="instructor"):
+            result=run_statement(f"INSERT INTO Instructors VALUES(\"{username}\", \"{title}\", \"{department_id}\");")
+        else:
+            result=run_statement(f"INSERT INTO Students VALUES(\"{username}\", {student_id}, JSON_ARRAY());")
+        return HttpResponseRedirect('../database_managers?action=1')
+    except: pass
+    return HttpResponseRedirect('../instructors?action=2')
 
 def deleteStudent(req):
-    # To delete a user, we just need to student_id of the user.
-    student_id = req.POST["student_id"]
-    # After collecting that information, we just need to execute this query.
-    result=run_statement(f"DELETE FROM Students WHERE student_id=\"{student_id}\";")
-    # Then set action equals 1.
-    return HttpResponseRedirect('../database_managers?action=1')
+    try:
+        # To delete a user, we just need to student_id of the user.
+        student_id = req.POST["student_id"]
+        # After collecting that information, we just need to execute this query.
+        result=run_statement(f"DELETE FROM Students WHERE student_id=\"{student_id}\";")
+        # Then set action equals 1.
+        return HttpResponseRedirect('../database_managers?action=1')
+    except: pass
+    return HttpResponseRedirect('../instructors?action=2')
 
 def updateInstructor(req):
-    # To update an instructor, we do the same thing. Collect data, execute query with that data.
-    username = req.POST["username"]
-    title = req.POST["title"]
-    result=run_statement(f"UPDATE Instructors SET title=\"{title}\" WHERE username=\"{username}\";")
-    return HttpResponseRedirect('../database_managers?action=1')
+    try:
+        # To update an instructor, we do the same thing. Collect data, execute query with that data.
+        username = req.POST["username"]
+        title = req.POST["title"]
+        result=run_statement(f"UPDATE Instructors SET title=\"{title}\" WHERE username=\"{username}\";")
+        return HttpResponseRedirect('../database_managers?action=1') 
+    except: pass
+    return HttpResponseRedirect('../instructors?action=2')
 
 def getStudent(req):
     # To get a student, we do the same thing. Collect data, execute query with that data.
