@@ -70,7 +70,7 @@ def filter(req):
     min_credit = req.POST["min_credit"]
     max_credit = req.POST["max_credit"]
 
-    data = []
+    data = run_statement(f"CALL filter(\'{department_id}\',\'{campus}\',{min_credit},{max_credit})")
 
     return render(req,'table.html',{"title":f"Courses filtered:", "headers": ("Course ID", "Course Name", "Instructor Surname", 
         "Department", "Credits", "Classroom ID", "Time Slot", "Quota", "Prerequisites"), "data": data})

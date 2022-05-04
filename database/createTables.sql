@@ -27,26 +27,6 @@ CREATE TABLE IF NOT EXISTS Database_Managers(
     PRIMARY KEY (username)
 );
 
--- Delete triger if exists to prevent error.
-drop trigger if exists chk_count;
--- This trigger will limit database row count to at most 4.
--- We will change delimiter temporarily to run trigger.
--- DELIMITER //
-CREATE TRIGGER chk_count
-BEFORE INSERT
-ON Database_Managers
-FOR EACH ROW
-BEGIN
-    -- Get count from database_managers
-    SELECT COUNT(*) INTO @cnt FROM Database_Managers;
-    IF @cnt > 3 THEN
-        -- If count more or equal to 4, then send signal to interrupt insertion.
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'No more than 4 managers are allowed';
-    END IF;
-END;
--- DELIMITER ;
-
 -- Instructors table which is inherited from User table.
 -- password,name,surname,email,department_id should be taken from Users table using username key.
 CREATE TABLE IF NOT EXISTS Instructors(
@@ -98,6 +78,8 @@ CREATE TABLE IF NOT EXISTS Students(
     student_id INTEGER,
     -- added_courses will be used as JSON_ARRAY
     added_courses JSON,
+    completed_credits INT DEFAULT 0,
+    gpa FLOAT DEFAULT NULL,
     PRIMARY KEY (student_id),
     FOREIGN KEY (username) REFERENCES User(username)
     -- If we modify or delete in this table, we should also do them on User table.
@@ -114,3 +96,54 @@ CREATE TABLE IF NOT EXISTS Grades(
     FOREIGN KEY (student_id) REFERENCES Students(student_id),
     FOREIGN KEY (course_id) REFERENCES Course(course_id) 
 );
+
+DROP PROCEDURE IF EXISTS filter;
+CREATE PROCEDURE filter( IN department_id CHAR(100), 
+                        IN campus CHAR(100), 
+                        IN min_credit INT, 
+                        IN max_credit INT)
+BEGIN
+    SELECT c.course_id, c.name, u.surname, i.department_id, c.credits, c.classroom_id, c.slot,
+        c.quota, c.prerequisites
+    FROM Course c, User u, Instructors i, Classroom s
+    WHERE s.campus=campus and s.classroom_id=c.classroom_id and c.instructor_username=i.username
+        and u.username=i.username and i.department_id=department_id and min_credit <= c.credits and c.credits <= max_credit;
+END;
+
+-- Delete triger if exists to prevent error.
+drop TRIGGER if exists chk_count;
+-- This trigger will limit database row count to at most 4.
+CREATE TRIGGER chk_count BEFORE INSERT ON Database_Managers FOR EACH ROW
+BEGIN
+    -- Get count from database_managers
+    SELECT COUNT(*) INTO @cnt FROM Database_Managers;
+    IF @cnt > 3 THEN
+        -- If count more or equal to 4, then send signal to interrupt insertion.
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No more than 4 managers are allowed';
+    END IF;
+END;
+
+-- Delete triger if exists to prevent error.
+DROP TRIGGER IF EXISTS chk_quota;
+CREATE TRIGGER chk_quota BEFORE INSERT ON Course FOR EACH ROW
+BEGIN
+    SELECT s.classroom_capacity INTO @capacity FROM Classroom s
+        WHERE NEW.classroom_id=s.classroom_id;
+    IF NEW.quota > @capacity THEN
+        -- send signal to interrupt insertion.
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Quota greater then classroom capacity';
+    END IF;
+END;
+
+-- Delete triger if exists to prevent error.
+DROP TRIGGER IF EXISTS chk_student;
+CREATE TRIGGER chk_student AFTER INSERT ON Grades FOR EACH ROW
+BEGIN
+    SELECT SUM(c.credits), SUM(c.credits*g.grade)/SUM(c.credits) INTO @credits, @gpa
+        FROM Course c, Grades g
+        WHERE NEW.student_id=g.student_id and g.course_id=c.course_id
+        GROUP BY New.student_id;
+    UPDATE Students SET completed_credits=@credits, gpa=@gpa WHERE NEW.student_id=student_id;
+END;

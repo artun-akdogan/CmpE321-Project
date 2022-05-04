@@ -19,10 +19,8 @@ def login(req):
 
 def homePage(req):
     students=run_statement(f"SELECT u.username, u.name, u.surname, u.email, u.department_id,\
-        SUM(c.credits) as completed_credits, SUM(c.credits*g.grade)/SUM(c.credits) as gpa\
-        FROM User u, Students s, Course c, Grades g \
-        WHERE s.username=u.username and s.student_id=g.student_id and g.course_id=c.course_id\
-        GROUP BY s.username ORDER BY completed_credits;")
+        s.completed_credits, s.gpa FROM User u, Students s WHERE s.username=u.username\
+        ORDER BY s.completed_credits;")
     instructors=run_statement(f"SELECT u.username, u.name, u.surname, u.email, u.department_id, i.title\
         FROM User u, Instructors i WHERE i.username=u.username;")
     username=req.session["username"] #Retrieve the username of the logged-in user
